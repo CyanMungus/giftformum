@@ -357,6 +357,7 @@ async function init(){
     auth=firebase.auth();
     db=firebase.database();
 
+    await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
     await auth.signInAnonymously();
     uid=auth.currentUser.uid;
     $("connectionBadge").textContent="Online";
