@@ -196,37 +196,85 @@ async function createRoom(){
 }
 
 async function joinRoom(){
-  const name=cleanName($("joinName").value);
-  const code=cleanCode($("joinCode").value);
-  if(!name){toast("Type your name first 💗");return;}
-  if(code.length!==6){toast("That room code needs 6 characters.");return;}
+  const name = cleanName($("joinName").value);
+  const code = cleanCode($("joinCode").value);
 
-  $("joinRoomBtn").disabled=true;
+  if(!name){
+    toast("Type your name first 💗");
+    return;
+  }
+
+  if(code.length !== 6){
+    toast("That room code needs 6 characters.");
+    return;
+  }
+
+  $("joinRoomBtn").disabled = true;
+
   try{
-    const ref=db.ref(`rooms/${code}`);
-    const result=await ref.transaction(room=>{
-      if(!room) return; // abort
-      room.players = room.players || {};
-      if(room.players[uid]) {
-        room.players[uid].name=name;
-        return room;
-      }
-      if(Object.keys(room.players).length>=2) return; // abort
-      room.players[uid]={name,joinedAt:Date.now()};
-      return room;
-    });
-    if(!result.committed){
-      const snap=await ref.once("value");
-      toast(!snap.exists() ? "Room not found 👀" : "That room is full.");
+    const ref = db.ref(`rooms/${code}`);
+
+    // Check the room first.
+    const firstSnap = await ref.once("value");
+
+    if(!firstSnap.exists()){
+      toast("Room not found 👀");
       return;
     }
+
+    const firstRoom = firstSnap.val();
+    const existingPlayers = firstRoom.players || {};
+
+    // Only say FULL if it is ACTUALLY full.
+    if(
+      !existingPlayers[uid] &&
+      Object.keys(existingPlayers).length >= 2
+    ){
+      toast("That room is full.");
+      return;
+    }
+
+    const result = await ref.transaction(room => {
+
+      // If the room disappeared while joining, stop.
+      if(!room) return;
+
+      room.players = room.players || {};
+
+      // Already in the room.
+      if(room.players[uid]){
+        room.players[uid].name = name;
+        return room;
+      }
+
+      // Re-check inside the transaction.
+      if(Object.keys(room.players).length >= 2){
+        return;
+      }
+
+      room.players[uid] = {
+        name,
+        joinedAt: Date.now()
+      };
+
+      return room;
+    });
+
+    if(!result.committed){
+      toast("Couldn't join the room — try again.");
+      return;
+    }
+
     await ensureInitialGame(code);
     enterRoom(code);
-  }catch(err){
-    console.error(err);toast("Couldn't join that room.");
-  }finally{$("joinRoomBtn").disabled=false;}
-}
 
+  }catch(err){
+    console.error(err);
+    toast("Couldn't join that room.");
+  }finally{
+    $("joinRoomBtn").disabled = false;
+  }
+}
 function detachRoom(){
   if(roomRef && roomListener) roomRef.off("value",roomListener);
   if(roomRef && messagesListener) roomRef.child("messages").off("value",messagesListener);
