@@ -1,0 +1,18 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$room": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".validate": "newData.hasChildren(['hostUid','players']) || !newData.exists()",
+        "messages": {
+          "$message": {
+            ".validate": "newData.hasChildren(['uid','name','text','createdAt']) && newData.child('uid').val() === auth.uid && newData.child('text').isString() && newData.child('text').val().length <= 200"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#ff8fbd">
+  <title>Mummy's Game Hub 💗</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button id="homeBtn" class="ghost hidden">← Home</button>
+    <div class="brand">💗 Mummy's Game Hub</div>
+    <div id="connectionBadge" class="badge">Connecting…</div>
+  </header>
+
+  <main>
+    <section id="setupView" class="view">
+      <div class="card setup-card">
+        <div class="big-icon">🔧</div>
+        <h1>One tiny setup first</h1>
+        <p>This copy needs your Firebase settings before online rooms can work.</p>
+        <p class="muted">Open <code>firebase-config.js</code>, paste your Firebase web app config, then upload the folder to GitHub Pages.</p>
+        <details>
+          <summary>What do I need to enable?</summary>
+          <ol>
+            <li>Firebase Authentication → Anonymous sign-in</li>
+            <li>Firebase Realtime Database</li>
+            <li>Use the included <code>database.rules.json</code> rules</li>
+          </ol>
+        </details>
+      </div>
+    </section>
+
+    <section id="homeView" class="view hidden">
+      <div class="hero card">
+        <div class="big-icon">🎮</div>
+        <h1>Mummy's Game Hub</h1>
+        <p>Create a private-ish room, share the code, chat, and play together.</p>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h2>Create a room</h2>
+          <label>Your name
+            <input id="createName" maxlength="20" placeholder="Mummy">
+          </label>
+          <button id="createRoomBtn" class="primary">Create room ✨</button>
+        </div>
+
+        <div class="card">
+          <h2>Join a room</h2>
+          <label>Your name
+            <input id="joinName" maxlength="20" placeholder="John">
+          </label>
+          <label>Room code
+            <input id="joinCode" maxlength="6" inputmode="text" placeholder="PINK42">
+          </label>
+          <button id="joinRoomBtn" class="secondary">Join room 🚪</button>
+        </div>
+      </div>
+
+      <div class="card note">
+        <strong>Little safety rule:</strong> room codes are not passwords. Keep chats to family/friends and don't put private information in them.
+      </div>
+    </section>
+
+    <section id="roomView" class="view hidden">
+      <div class="room-head card">
+        <div>
+          <div class="eyebrow">ROOM CODE</div>
+          <div class="room-code" id="roomCodeText">------</div>
+        </div>
+        <button id="copyCodeBtn" class="secondary">Copy code</button>
+        <button id="leaveRoomBtn" class="ghost danger">Leave</button>
+      </div>
+
+      <div class="room-layout">
+        <div class="left-column">
+          <div class="card">
+            <div class="title-row">
+              <h2>Players</h2>
+              <span id="playerCount" class="pill">0/2</span>
+            </div>
+            <div id="playersList" class="players"></div>
+          </div>
+
+          <div class="card">
+            <div class="title-row">
+              <h2>🐍 Snakes & Ladders</h2>
+              <button id="resetGameBtn" class="small-btn hidden">Reset</button>
+            </div>
+
+            <div id="gameWaiting" class="game-waiting">
+              Waiting for two players…
+            </div>
+
+            <div id="gameArea" class="hidden">
+              <div class="game-status" id="gameStatus">Ready!</div>
+              <div class="scoreline">
+                <span>💗 <b id="p1Name">Player 1</b>: <span id="p1Pos">1</span></span>
+                <span>💜 <b id="p2Name">Player 2</b>: <span id="p2Pos">1</span></span>
+              </div>
+              <div id="board" class="board"></div>
+              <div class="dice-area">
+                <div id="diceFace" class="dice">🎲</div>
+                <button id="rollBtn" class="primary">Roll dice</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="card chat-card">
+          <div class="title-row">
+            <h2>💬 Room chat</h2>
+            <span id="chatStatus" class="muted"></span>
+          </div>
+          <div id="messages" class="messages" aria-live="polite"></div>
+          <form id="chatForm" class="chat-form">
+            <input id="chatInput" maxlength="200" autocomplete="off" placeholder="Type a message…">
+            <button class="primary" type="submit">Send</button>
+          </form>
+        </aside>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden"></div>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
